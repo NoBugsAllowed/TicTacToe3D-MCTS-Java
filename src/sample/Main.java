@@ -3,10 +3,10 @@ package sample;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -19,7 +19,6 @@ import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Modality;
@@ -32,8 +31,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-
-public class Main extends Application {
+public class Main extends Application implements TicTacToe3D.OnMoveMadeListener {
     private static final int N = 4;
     private static final int Big = 10000;
     private static final double STICK_RADIUS = 0.2;
@@ -46,6 +44,7 @@ public class Main extends Application {
     private Color COLOR_2;
     private Color currentColor;
     private Stage window;
+    private Group root;
     private Label gameFinishedInfo;
     private Rotate yCameraRotate;
     private Rotate xCameraRotate;
@@ -54,145 +53,89 @@ public class Main extends Application {
     private double lastMouseY;
     private double yCameraAngle = 20;
     private double xCameraAngle = -30;
-    private int start;
+    private GameMode gameMode;
     private int player = 1;
     private boolean isGameFinished = false;
+    private TicTacToe3D game;
 
-    private boolean EndOfGame2(int[][][] isPresent, Coords c1){
-        for(int i=-1; i<2; i++)
-            for(int j=-1; j<2; j++)
-                for(int k=-1; k<2; k++){
-                    if(i==0 && j==0 && k==0) continue;
-                    Coords c2 = new Coords(c1.getX()+i,c1.getY()+j,c1.getZ()+k);
-                    Coords c3 = new Coords(c1.getX()+2*i,c1.getY()+2*j,c1.getZ()+2*k);
-                    Coords c4 = new Coords(c1.getX()+3*i,c1.getY()+3*j,c1.getZ()+3*k);
-                    if(c2.isCorrect && c3.isCorrect && c4.isCorrect){
-                        if(isPresent[c1.getX()][c1.getY()][c1.getZ()]==
-                                isPresent[c2.getX()][c2.getY()][c2.getZ()]&&isPresent[c2.getX()][c2.getY()][c2.getZ()]
-                                ==isPresent[c3.getX()][c3.getY()][c3.getZ()]&&isPresent[c4.getX()][c4.getY()][c4.getZ()]
-                                ==isPresent[c3.getX()][c3.getY()][c3.getZ()]) return true;}
-                    c4 = new Coords(c1.getX()-i,c1.getY()-j,c1.getZ()-k);
-                    if(c2.isCorrect && c3.isCorrect && c4.isCorrect){
-                        if(isPresent[c1.getX()][c1.getY()][c1.getZ()]==
-                                isPresent[c2.getX()][c2.getY()][c2.getZ()]&&isPresent[c2.getX()][c2.getY()][c2.getZ()]
-                                ==isPresent[c3.getX()][c3.getY()][c3.getZ()]&&isPresent[c4.getX()][c4.getY()][c4.getZ()]
-                                ==isPresent[c3.getX()][c3.getY()][c3.getZ()]) return true;}
-                }
-        return false;
+    @Override
+    public void moveMade(int player, int x, int y, int z) {
+        Sphere ball = new Sphere(BALL_RADIUS);
+        ball.setMaterial(new PhongMaterial(player==1?COLOR_1:COLOR_2));
+        ball.setDrawMode(DrawMode.FILL);
+        ball.setTranslateX(x * STICK_DIST);
+        ball.setTranslateZ(y *STICK_DIST);
+        ball.setTranslateY(z * (-2) -1);
+        root.getChildren().add(ball);
     }
 
-    private void alfabeta(GameState gs, boolean isMaximizer, int currentLevel, int terminalLevel, int player, int alfa, int beta){
-        if(currentLevel==terminalLevel) {gs.ComputeValue(); return;}
-        gs.ComputeValue();
-        if(gs.getValue()==Big||gs.getValue()==-Big) return;
-
-        gs.InitMoves(player);
-        for (GameState g:gs.moves
-        ) {
-            alfabeta(g,!isMaximizer,currentLevel+1,terminalLevel,player==1?2:1,alfa,beta);
-            if(isMaximizer) {
-                if(g.getValue()>alfa) {alfa = g.getValue(); gs.setValue(alfa);}
-                if(alfa>=beta) break;
-            }
-            else {
-                if(g.getValue()<beta) {beta = g.getValue(); gs.setValue(beta);}
-                if(alfa>=beta) break;
-            }
+    @Override
+    public void gameFinished(int winner,String name) {
+        if(gameMode==GameMode.PvP) {
+            gameFinishedInfo.setText(name + " wins!");
+            gameFinishedInfo.setTextFill(winner==1?COLOR_1:COLOR_2);
         }
-        //gs.ComputeValue(isMaximizer);
+        else if(winner==1) {
+            gameFinishedInfo.setText("You win!");
+        }
+        else {
+            gameFinishedInfo.setText("AI wins!");
+        }
     }
 
     private Scene createGameArea() {
         // Sticks
         AnchorPane anchorPane = new AnchorPane();
         Scene scene = new Scene(anchorPane);
-        Group root = new Group();
+        root = new Group();
         Cylinder[] sticks = new Cylinder[N*N];
         int[] count = new int[N*N];
-        int[][][] isPresent = new int[N][N][N];
+        int[][][] board = new int[N][N][N];
         for(int i=0; i<N; i++)
-            for(int j=0; j<N; j++) Arrays.fill(isPresent[i][j], 0);
+            for(int j=0; j<N; j++) Arrays.fill(board[i][j], 0);
 
-        for (int i = -N/2; i < N/2; i++)
-            for (int j=-N/2; j< N/2; j++)
+        for (int i = 0; i < N; i++)
+            for (int j = 0; j < N; j++)
             {
                 Cylinder stick = new Cylinder(STICK_RADIUS,STICK_H);
                 stick.setMaterial(new PhongMaterial(Color.GRAY));
                 stick.setDrawMode(DrawMode.FILL);
-                //stick.getTransforms().add(new Translate(i*STICK_DIST,-STICK_H/2,j*STICK_DIST));
-                stick.setTranslateX(i*STICK_DIST + STICK_DIST/2);
+                stick.setTranslateX(i * STICK_DIST);
                 stick.setTranslateY(-STICK_H/2);
-                stick.setTranslateZ(j*STICK_DIST + STICK_DIST/2);
+                stick.setTranslateZ((j * STICK_DIST));
                 stick.setOnMouseClicked(event->{
-                    if(isGameFinished) {
+                    if(game.getGameState() != TicTacToe3D.GameState.STARTED) {
                         return;
                     }
-                    double I = (stick.getTranslateX()-STICK_DIST/2)/STICK_DIST+N/2;
-                    double J = (stick.getTranslateZ()-STICK_DIST/2)/STICK_DIST+N/2;
-                    int k = (int)I+(int)J*N;
-                    double y=0;
-                    if(count[k]==N) return;
-                    /*if(count[k]==0) y=-BALL_RADIUS;
-                    if(count[k]==1) y=-3*BALL_RADIUS;
-                    if(count[k]==2) y=-5*BALL_RADIUS;*/
-                    y = -count[k]*2-1;
+                    double tx = stick.getTranslateX();
+                    double tz = stick.getTranslateZ();
+                    int X = (int)(tx / STICK_DIST);
+                    int Y = (int)(tz / STICK_DIST);
+                    int Z = game.getStickElementsCount(X,Y);
 
-                    Sphere ball = new Sphere(BALL_RADIUS);
-                    ball.setMaterial(new PhongMaterial(currentColor));
-                    ball.setDrawMode(DrawMode.FILL);
-                    ball.setTranslateX(stick.getTranslateX());
-                    ball.setTranslateZ(stick.getTranslateZ());
-                    ball.setTranslateY(y);
-                    //balls[count[k]*9 + k] = ball;
-                    isPresent[(int)I][(int)J][count[k]] = player;
-                    root.getChildren().add(ball);
+                    if(!game.makeMove(player,X,Y)) return;
 
-                    if(EndOfGame2(isPresent, new Coords((int)I,(int)J, count[k]))){
-                        isGameFinished = true;
-                        if(start==0) {
-                            gameFinishedInfo.setText(player==1?"Player 1. wins!":"Player 2. wins!");
-                            gameFinishedInfo.setTextFill(player==1?COLOR_1:COLOR_2);
-                        }
-                        else {
-                            gameFinishedInfo.setText("You win!");
-                            //gameFinishedInfo.setTextFill(COLOR_1);
-                        }
-                        return;
+                    if(gameMode==GameMode.PvP) {
+                        currentColor = currentColor==COLOR_1?COLOR_2:COLOR_1;
+                        player=player==1?2:1;
                     }
-                    count[k]++;
-                    if(start==0) {currentColor = currentColor==COLOR_1?COLOR_2:COLOR_1; player=player==1?2:1;}
-                    else {GameState gs = new GameState(isPresent, new Coords(-1,-1,-1),N);
-                        alfabeta(gs,true,0,start==1?1:4,2,-100000,100000);
-                        Coords move = new Coords(-1,-1,-1);
-                        for (GameState g:gs.moves
-                        ) {
-                            if(g.getValue()==gs.getValue()) {move = new Coords(g.getLastMove().getX(),g.getLastMove().getY(),g.getLastMove().getZ());break;}
-                        }
-                        Sphere ball1 = new Sphere(BALL_RADIUS);
-                        ball1.setMaterial(new PhongMaterial(COLOR_2));
-                        ball1.setDrawMode(DrawMode.FILL);
-                        ball1.setTranslateX((move.getX()-N/2)*STICK_DIST+STICK_DIST/2);
-                        ball1.setTranslateZ((move.getY()-N/2)*STICK_DIST+STICK_DIST/2);
-                        ball1.setTranslateY(move.getZ()*(-2)-1);
-                        root.getChildren().add(ball1);
-                        isPresent[move.getX()][move.getY()][move.getZ()] = 2;
-                        if(EndOfGame2(isPresent, move)){
-                            isGameFinished = true;
-                            gameFinishedInfo.setText("AI wins!");
-                            //gameFinishedInfo.setTextFill(COLOR_2);
-                            return;
-                        }
-                        count[move.getX()+N*move.getY()]++;
+                    else {
+                        // ruch AI
+                        // Tutaj wywolac game.makeMove()
+                        game.makeMove(2,0,0);
                     }
                 });
-                sticks[(i+N/2)+(j+N/2)*N] = stick;
+                sticks[i + j * N] = stick;
 
             }
+        // Podstawka planszy
         Box surface = new Box(N * STICK_DIST, 0.5, N * STICK_DIST);
+        surface.setTranslateX((N - 1) * STICK_DIST / 2);
+        surface.setTranslateZ((N - 1) * STICK_DIST / 2);
         surface.setMaterial(new PhongMaterial(Color.BROWN));
         surface.setDrawMode(DrawMode.FILL);
-
-        Translate pivot = new Translate();
+        // Przesuniecie kamery
+        Translate pivot = new Translate((N - 1) * STICK_DIST / 2,0,(N - 1) * STICK_DIST / 2);
         yCameraRotate = new Rotate(yCameraAngle, Rotate.Y_AXIS);
         xCameraRotate = new Rotate(xCameraAngle, Rotate.X_AXIS);
         cameraTranslate = new Translate(0, 0, -48);
@@ -238,15 +181,6 @@ public class Main extends Application {
             } else if (cameraTranslate.getZ() > -MAX_CAMERA_DIST)
                 cameraTranslate.setZ(cameraTranslate.getZ() - 1);
         });
-//        window.addEventHandler(KeyEvent.KEY_RELEASED, (KeyEvent event) -> {
-//            if (KeyCode.ESCAPE == event.getCode()) {
-//                try {
-//                    displayMenu(0);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
         window.addEventHandler(KeyEvent.KEY_RELEASED,escPressedHandler);
         anchorPane.getChildren().add(subScene);
 
@@ -310,24 +244,44 @@ public class Main extends Application {
             COLOR_1 = cbFirst.getSelectionModel().getSelectedItem();
             COLOR_2 = cbSecond.getSelectionModel().getSelectedItem();
             currentColor = COLOR_1;
+            game = new TicTacToe3D(N);
+            game.attachOnMoveListener(this);
+            try {
+                game.registerPlayer("Player 1");
+                game.registerPlayer("Player 2");
+            }
+            catch (TicTacToe3D.GameStartedException ex) {
+                ex.printStackTrace();
+            }
+            gameMode = GameMode.PvP;
             switchScene(createGameArea());
-            start = 0;
         });
         Button btnPvAIEasy = (Button) root.lookup("#btnPvAIEasy");
         btnPvAIEasy.setOnAction(e -> {
             COLOR_1 = cbFirst.getSelectionModel().getSelectedItem();
             COLOR_2 = cbSecond.getSelectionModel().getSelectedItem();
             currentColor = COLOR_1;
+            game = new TicTacToe3D(N);
+            game.attachOnMoveListener(this);
+            try {
+                game.registerPlayer("Player 1");
+                game.registerPlayer("AI");
+            }
+            catch (TicTacToe3D.GameStartedException ex) {
+                ex.printStackTrace();
+            }
+            gameMode = GameMode.PvAI;
             switchScene(createGameArea());
-            start = 1;
         });
         Button btnPvAIHard = (Button) root.lookup("#btnPvAIHard");
         btnPvAIHard.setOnAction(e -> {
             COLOR_1 = cbFirst.getSelectionModel().getSelectedItem();
             COLOR_2 = cbSecond.getSelectionModel().getSelectedItem();
             currentColor = COLOR_1;
+            game = new TicTacToe3D(N);
+            game.attachOnMoveListener(this);
+            gameMode = GameMode.PvAI;
             switchScene(createGameArea());
-            start = 2;
         });
         return new Scene(root, 400, 600);
     }
@@ -417,4 +371,5 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+
 }
