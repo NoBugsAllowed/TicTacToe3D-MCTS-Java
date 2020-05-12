@@ -26,6 +26,9 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
+import sample.mcts.BasicUctPolicy;
+import sample.mcts.MonteCarloPolicy;
+import sample.mcts.MtcsUctPlayer;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -84,6 +87,11 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
     }
 
     private Scene createGameArea() {
+
+        MtcsUctPlayer p = new MtcsUctPlayer(2,new BasicUctPolicy(1),new MonteCarloPolicy());
+
+
+
         // Sticks
         AnchorPane anchorPane = new AnchorPane();
         Scene scene = new Scene(anchorPane);
@@ -122,7 +130,11 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
                     else {
                         // ruch AI
                         // Tutaj wywolac game.makeMove()
-                        game.makeMove(2,0,0);
+                        Board board1 = new Board(game.getSize());
+                        board1.setBoard(game.getBoard());
+                        p.PrepareMove(10000,board1);
+                        Position pos = p.MakeMove();
+                        game.makeMove(2,pos.getX(),pos.getY());
                     }
                 });
                 sticks[i + j * N] = stick;
@@ -196,6 +208,8 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
     }
 
     private Scene createStartMenu() throws IOException {
+        /*testy*/
+
         Parent root = FXMLLoader.load(getClass().getResource("start_menu.fxml"));
 
         // Prepare comboBoxes for choosing colors
