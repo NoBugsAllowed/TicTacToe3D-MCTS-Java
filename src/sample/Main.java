@@ -1,12 +1,10 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -26,9 +24,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
-import sample.mcts.BasicUctPolicy;
-import sample.mcts.MonteCarloPolicy;
-import sample.mcts.MtcsUctPlayer;
+import sample.mcts.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -88,8 +84,7 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
 
     private Scene createGameArea() {
 
-        MtcsUctPlayer p = new MtcsUctPlayer(2,new BasicUctPolicy(1),new MonteCarloPolicy());
-
+        MctsUctPlayer p = new MctsUctPlayer(2,new BasicUctPolicy(1),new MonteCarloHeuristicPolicy());
 
 
         // Sticks

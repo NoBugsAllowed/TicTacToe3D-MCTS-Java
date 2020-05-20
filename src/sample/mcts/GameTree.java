@@ -15,6 +15,7 @@ public class GameTree {
     private int reward;
     private int simulations;
     private boolean realNode;
+    private int maxReward;
 
     public GameTree(int playerToMove, Position lastMove, Board board, GameTree parent, boolean realNode) {
         this.playerToMove = playerToMove;
@@ -25,6 +26,15 @@ public class GameTree {
         this.realNode = realNode;
         reward = 0;
         simulations = 0;
+        maxReward = 0;
+    }
+
+    public int getMaxReward() {
+        return maxReward;
+    }
+
+    public void setMaxReward(int maxReward) {
+        this.maxReward = maxReward;
     }
 
     public Position getLastMove() {
@@ -125,6 +135,7 @@ public class GameTree {
     }
 
     public int Winner() {return board.Winner();}
+    public int FastWinner(int player, int x, int y, int z) {return board.FastWinner(player,x,y,z);}
 
     @Override
     public String toString() {

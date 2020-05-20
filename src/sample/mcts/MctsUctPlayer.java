@@ -6,7 +6,7 @@ import sample.Position;
 
 import java.util.List;
 
-public class MtcsUctPlayer implements ArtificialPlayer {
+public class MctsUctPlayer implements ArtificialPlayer {
 
     private int id;
     private GameTree root;
@@ -33,7 +33,7 @@ public class MtcsUctPlayer implements ArtificialPlayer {
         }
     }
 
-    public MtcsUctPlayer(int id, ChoseNodePolicy insidePolicy, ChoseNodePolicy outsidePolicy) {
+    public MctsUctPlayer(int id, ChoseNodePolicy insidePolicy, ChoseNodePolicy outsidePolicy) {
         this.id = id;
         this.insidePolicy = insidePolicy;
         this.outsidePolicy = outsidePolicy;
@@ -44,7 +44,7 @@ public class MtcsUctPlayer implements ArtificialPlayer {
     }
 
     private GameTree Selection(GameTree node) {
-        if(node.IsLeaf())
+        if (node.IsLeaf())
             return node;
         List<GameTree> nodes = node.MakeChildren();
         int index = insidePolicy.BestNode(node);
@@ -57,8 +57,7 @@ public class MtcsUctPlayer implements ArtificialPlayer {
             node.getBoard().PutElement(n.getLastMove().getX(), n.getLastMove().getY(), node.getPlayerToMove());
             return n;
         }
-        GameTree ret = Selection(n);
-        return ret;
+        return Selection(n);
     }
 
     private int Simulation(GameTree node) {
@@ -75,7 +74,10 @@ public class MtcsUctPlayer implements ArtificialPlayer {
         GameTree n = nodes.get(index);
         node.getBoard().PutElement(n.getLastMove().getX(), n.getLastMove().getY(), node.getPlayerToMove());
         if (n.IsLeaf()) {
-            int winner = n.Winner();
+            //int winner = n.Winner();
+            int x = n.getLastMove().getX();
+            int y = n.getLastMove().getY();
+            int winner = n.FastWinner(node.getPlayerToMove(),x,y,node.getBoard().GetZTop(x,y));
             node.getBoard().TakeElement(n.getLastMove().getX(), n.getLastMove().getY());
             if (winner == id)
                 return 2;
@@ -92,8 +94,10 @@ public class MtcsUctPlayer implements ArtificialPlayer {
         if (node.isRealNode()) {
             node.setReward(node.getReward() + reward);
             node.setSimulations(node.getSimulations() + 1);
-            if(node.getLastMove()!=null)
-                node.getBoard().TakeElement(node.getLastMove().getX(),node.getLastMove().getY());
+            if (node.getMaxReward() < reward)
+                node.setMaxReward(reward);
+            if (node.getLastMove() != null)
+                node.getBoard().TakeElement(node.getLastMove().getX(), node.getLastMove().getY());
         }
         if (node.getParent() != null)
             BackPropagation(node.getParent(), reward);
@@ -113,12 +117,10 @@ public class MtcsUctPlayer implements ArtificialPlayer {
     public Position MakeMove() {
         double bestMeanReward = 0;
         Position bestPosition = null;
-        for(int i=0;i<root.getChildren().size();i++)
-        {
-            GameTree child =root.getChildren().get(i);
-            double reward = (double)child.getReward()/(double)child.getSimulations();
-            if(reward>bestMeanReward)
-            {
+        for (int i = 0; i < root.getChildren().size(); i++) {
+            GameTree child = root.getChildren().get(i);
+            double reward = (double) child.getReward() / (double) child.getSimulations();
+            if (reward > bestMeanReward) {
                 bestMeanReward = reward;
                 bestPosition = child.getLastMove();
             }
