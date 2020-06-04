@@ -1,0 +1,3 @@
+P1Wins=7
+P2Wins=3
+Draws=0

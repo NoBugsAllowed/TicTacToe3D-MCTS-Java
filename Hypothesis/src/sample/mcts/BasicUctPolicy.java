@@ -2,14 +2,22 @@ package sample.mcts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BasicUctPolicy implements ChoseNodePolicy {
 
     private double C;
+    private Random r;
 
     public BasicUctPolicy(double c) {
         C = c;
+        this.r = new Random(1);
+    }
+
+    public BasicUctPolicy(double c, int seed) {
+        C = c;
+        this.r = new Random(seed);
     }
 
     @Override
@@ -26,7 +34,7 @@ public class BasicUctPolicy implements ChoseNodePolicy {
 
         int size = notUsedYetNodes.size();
         if (size > 0) {
-            int num = children.indexOf(notUsedYetNodes.get(ThreadLocalRandom.current().nextInt(0, size)));
+            int num = children.indexOf(notUsedYetNodes.get(r.nextInt(size)));
             return num;
         }
 
@@ -40,6 +48,9 @@ public class BasicUctPolicy implements ChoseNodePolicy {
                 uctMaxValue = uctValue;
                 maxIndex = i;
             }
+        }
+        if (maxIndex < 0) {
+            int rrr = 5;
         }
         return maxIndex;
     }

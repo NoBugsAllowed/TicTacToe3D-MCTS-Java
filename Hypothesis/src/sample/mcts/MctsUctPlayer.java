@@ -5,6 +5,7 @@ import sample.Board;
 import sample.Position;
 
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MctsUctPlayer implements ArtificialPlayer {
 
@@ -13,6 +14,8 @@ public class MctsUctPlayer implements ArtificialPlayer {
     private ChoseNodePolicy insidePolicy;
     private ChoseNodePolicy outsidePolicy;
     private Board currentBoard;
+    private ReentrantLock lock;
+    private int keepConstructTree = 0; // 0 - nic się nie dzieje, 1 - wykonywany jest PrepareMove, 2 - kończony jest PrepareMove, 3 - Wykonywany jest MakeMove
 
     public GameTree ConstructTree(Board board, int depth) {
         currentBoard = board.Clone();
@@ -37,6 +40,7 @@ public class MctsUctPlayer implements ArtificialPlayer {
         this.id = id;
         this.insidePolicy = insidePolicy;
         this.outsidePolicy = outsidePolicy;
+        this.lock = new ReentrantLock();
     }
 
     public GameTree getRoot() {
@@ -77,7 +81,7 @@ public class MctsUctPlayer implements ArtificialPlayer {
             //int winner = n.Winner();
             int x = n.getLastMove().getX();
             int y = n.getLastMove().getY();
-            int winner = n.FastWinner(node.getPlayerToMove(),x,y,node.getBoard().GetZTop(x,y));
+            int winner = n.FastWinner(node.getPlayerToMove(), x, y, node.getBoard().GetZTop(x, y));
             node.getBoard().TakeElement(n.getLastMove().getX(), n.getLastMove().getY());
             if (winner == id)
                 return 2;
@@ -105,26 +109,66 @@ public class MctsUctPlayer implements ArtificialPlayer {
 
     @Override
     public void PrepareMove(int timeToMove, Board board) {
+        SetKeepConstructTree(1);
         root = ConstructTree(board, 0);
-        for (int i = 0; i < timeToMove; i++) {
-            GameTree node = Selection(root);
-            int reward = Simulation(node);
-            BackPropagation(node, reward);
+        while (true) {
+            if (GetKeepConstructTree()==1) {
+                GameTree node = Selection(root);
+                int reward = Simulation(node);
+                BackPropagation(node, reward);
+            }
+            else
+            {
+                SetKeepConstructTree(3);
+                return;
+            }
         }
     }
 
     @Override
     public Position MakeMove() {
+        SetKeepConstructTree(2);
+        while (GetKeepConstructTree()!=3);
         double bestMeanReward = 0;
         Position bestPosition = null;
-        for (int i = 0; i < root.getChildren().size(); i++) {
-            GameTree child = root.getChildren().get(i);
+        List<GameTree> children = root.MakeChildren();
+        for (int i = 0; i < children.size(); i++) {
+            GameTree child = children.get(i);
             double reward = (double) child.getReward() / (double) child.getSimulations();
             if (reward > bestMeanReward) {
                 bestMeanReward = reward;
                 bestPosition = child.getLastMove();
             }
         }
+        if(bestPosition == null)
+        {
+
+            int kkk = 4;
+        }
         return bestPosition;
+    }
+
+    @Override
+    public int GetId() {
+        return id;
+    }
+
+    @Override
+    public void ResetState() {
+        root = null;
+        keepConstructTree = 0;
+    }
+
+    private int GetKeepConstructTree() {
+        lock.lock();
+        int tmp = keepConstructTree;
+        lock.unlock();
+        return tmp;
+    }
+
+    private void SetKeepConstructTree(int value) {
+        lock.lock();
+        keepConstructTree = value;
+        lock.unlock();
     }
 }

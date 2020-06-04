@@ -10,7 +10,7 @@ public class MonteCarloHeuristicPolicy implements ChoseNodePolicy {
 
         List<GameTree> children = node.MakeChildren();
         double maxReward = Double.NEGATIVE_INFINITY;
-        int maxRewadrIndex = 0;
+        int maxRewardIndex = 0;
         for (int i = 0; i < children.size(); i++) {
             GameTree child = children.get(i);
             int x = child.getLastMove().getX();
@@ -20,11 +20,11 @@ public class MonteCarloHeuristicPolicy implements ChoseNodePolicy {
             double reward = node.getBoard().GetHeuristicFastReward(node.getPlayerToMove(),x,y,z);
             if (reward > maxReward) {
                 maxReward = reward;
-                maxRewadrIndex = i;
+                maxRewardIndex = i;
             }
             node.getBoard().TakeElement(child.getLastMove().getX(), child.getLastMove().getY());
         }
 
-        return maxRewadrIndex;
+        return maxRewardIndex;
     }
 }

@@ -84,8 +84,8 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
 
     private Scene createGameArea() {
 
-        MctsUctPlayer p = new MctsUctPlayer(2,new BasicUctPolicy(1),new MonteCarloHeuristicPolicy());
-
+        //ArtificialPlayer p = new MctsUctPlayer(2,new SecondModyficationUctPolicy(1),new MonteCarloPolicy());
+        ArtificialPlayer p = new HeuristicPlayer(2);
 
         // Sticks
         AnchorPane anchorPane = new AnchorPane();
@@ -127,9 +127,23 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
                         // Tutaj wywolac game.makeMove()
                         Board board1 = new Board(game.getSize());
                         board1.setBoard(game.getBoard());
-                        p.PrepareMove(10000,board1);
+//                        new Thread(new Runnable() {
+//                            public void run() {
+//                                p.PrepareMove(10000,board1);
+//                            }
+//                        }).start();
+//
+//                        try {
+//                            Thread.sleep(100);
+//                            Position pos = p.MakeMove();
+//                            game.makeMove(2,pos.getX(),pos.getY());
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+                        p.PrepareMove(1000,board1);
                         Position pos = p.MakeMove();
                         game.makeMove(2,pos.getX(),pos.getY());
+
                     }
                 });
                 sticks[i + j * N] = stick;

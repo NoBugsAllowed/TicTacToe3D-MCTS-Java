@@ -1,7 +1,5 @@
 package sample;
 
-import javafx.css.Match;
-
 public class Board {
     private int[][][] board;
     private int size;
@@ -246,7 +244,18 @@ public class Board {
             if (isLine) return PlayerOnFirstTile;
         }
 
-        return 0;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                for (int k = 0; k < size; k++) {
+                    if (board[i][j][k] == 0) {
+                        return 0;
+                    }
+                }
+            }
+        }
+
+        //remis
+        return -1;
     }
 
     public int FastWinner(int player, int x, int y, int z) {
@@ -359,16 +368,15 @@ public class Board {
             if (firstLinePlayer == 0 && board[x][y][i] != 0) {
                 firstLinePlayer = board[x][y][i];
             }
-            if (board[x][y][i] == 3 - firstLinePlayer){
+            if (board[x][y][i] == 3 - firstLinePlayer) {
                 isline = false;
                 break;
             }
-            if (board[x][y][i] == firstLinePlayer) lineSum +=1;
+            if (board[x][y][i] == firstLinePlayer) lineSum += 1;
         }
-        if(firstLinePlayer != 0 && isline)
-        {
-            if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-            else sumReward -=  Math.pow(10,lineSum);
+        if (firstLinePlayer != 0 && isline) {
+            if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+            else sumReward -= Math.pow(10, lineSum);
         }
 
         isline = true;
@@ -378,16 +386,15 @@ public class Board {
             if (firstLinePlayer == 0 && board[x][i][z] != 0) {
                 firstLinePlayer = board[x][i][z];
             }
-            if (board[x][i][z] == 3 - firstLinePlayer){
+            if (board[x][i][z] == 3 - firstLinePlayer) {
                 isline = false;
                 break;
             }
-            if (board[x][i][z] == firstLinePlayer) lineSum +=1;
+            if (board[x][i][z] == firstLinePlayer) lineSum += 1;
         }
-        if(firstLinePlayer != 0 && isline)
-        {
-            if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-            else sumReward -=  Math.pow(10,lineSum);
+        if (firstLinePlayer != 0 && isline) {
+            if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+            else sumReward -= Math.pow(10, lineSum);
         }
 
         isline = true;
@@ -397,16 +404,15 @@ public class Board {
             if (firstLinePlayer == 0 && board[i][y][z] != 0) {
                 firstLinePlayer = board[i][y][z];
             }
-            if (board[i][y][z] == 3 - firstLinePlayer){
+            if (board[i][y][z] == 3 - firstLinePlayer) {
                 isline = false;
                 break;
             }
-            if (board[i][y][z] == firstLinePlayer) lineSum +=1;
+            if (board[i][y][z] == firstLinePlayer) lineSum += 1;
         }
-        if(firstLinePlayer != 0 && isline)
-        {
-            if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-            else sumReward -=  Math.pow(10,lineSum);
+        if (firstLinePlayer != 0 && isline) {
+            if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+            else sumReward -= Math.pow(10, lineSum);
         }
 
         // przekątne w ramach płaszczyzn
@@ -415,19 +421,18 @@ public class Board {
             firstLinePlayer = 0;
             lineSum = 0;
             for (int i = 0; i < size; i++) {
-                if (firstLinePlayer == 0 && board[i][i][z]  != 0) {
-                    firstLinePlayer = board[i][i][z] ;
+                if (firstLinePlayer == 0 && board[i][i][z] != 0) {
+                    firstLinePlayer = board[i][i][z];
                 }
-                if (board[i][i][z]  == 3 - firstLinePlayer){
+                if (board[i][i][z] == 3 - firstLinePlayer) {
                     isline = false;
                     break;
                 }
-                if (board[i][i][z]  == firstLinePlayer) lineSum +=1;
+                if (board[i][i][z] == firstLinePlayer) lineSum += 1;
             }
-            if(firstLinePlayer != 0 && isline)
-            {
-                if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-                else sumReward -=  Math.pow(10,lineSum);
+            if (firstLinePlayer != 0 && isline) {
+                if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+                else sumReward -= Math.pow(10, lineSum);
             }
         }
         if (x + y == size - 1) {
@@ -438,16 +443,15 @@ public class Board {
                 if (firstLinePlayer == 0 && board[i][size - 1 - i][z] != 0) {
                     firstLinePlayer = board[i][size - 1 - i][z];
                 }
-                if (board[i][size - 1 - i][z] == 3 - firstLinePlayer){
+                if (board[i][size - 1 - i][z] == 3 - firstLinePlayer) {
                     isline = false;
                     break;
                 }
-                if (board[i][size - 1 - i][z] == firstLinePlayer) lineSum +=1;
+                if (board[i][size - 1 - i][z] == firstLinePlayer) lineSum += 1;
             }
-            if(firstLinePlayer != 0 && isline)
-            {
-                if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-                else sumReward -=  Math.pow(10,lineSum);
+            if (firstLinePlayer != 0 && isline) {
+                if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+                else sumReward -= Math.pow(10, lineSum);
             }
         }
 
@@ -459,16 +463,15 @@ public class Board {
                 if (firstLinePlayer == 0 && board[i][y][i] != 0) {
                     firstLinePlayer = board[i][y][i];
                 }
-                if (board[i][y][i] == 3 - firstLinePlayer){
+                if (board[i][y][i] == 3 - firstLinePlayer) {
                     isline = false;
                     break;
                 }
-                if (board[i][y][i] == firstLinePlayer) lineSum +=1;
+                if (board[i][y][i] == firstLinePlayer) lineSum += 1;
             }
-            if(firstLinePlayer != 0 && isline)
-            {
-                if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-                else sumReward -=  Math.pow(10,lineSum);
+            if (firstLinePlayer != 0 && isline) {
+                if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+                else sumReward -= Math.pow(10, lineSum);
             }
         }
         if (x + z == size - 1) {
@@ -476,19 +479,18 @@ public class Board {
             firstLinePlayer = 0;
             lineSum = 0;
             for (int i = 0; i < size; i++) {
-                if (firstLinePlayer == 0 && board[i][y][size - 1 - i]  != 0) {
-                    firstLinePlayer = board[i][y][size - 1 - i] ;
+                if (firstLinePlayer == 0 && board[i][y][size - 1 - i] != 0) {
+                    firstLinePlayer = board[i][y][size - 1 - i];
                 }
-                if (board[i][y][size - 1 - i]  == 3 - firstLinePlayer){
+                if (board[i][y][size - 1 - i] == 3 - firstLinePlayer) {
                     isline = false;
                     break;
                 }
-                if (board[i][y][size - 1 - i]  == firstLinePlayer) lineSum +=1;
+                if (board[i][y][size - 1 - i] == firstLinePlayer) lineSum += 1;
             }
-            if(firstLinePlayer != 0 && isline)
-            {
-                if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-                else sumReward -=  Math.pow(10,lineSum);
+            if (firstLinePlayer != 0 && isline) {
+                if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+                else sumReward -= Math.pow(10, lineSum);
             }
         }
 
@@ -500,16 +502,15 @@ public class Board {
                 if (firstLinePlayer == 0 && board[x][i][i] != 0) {
                     firstLinePlayer = board[x][i][i];
                 }
-                if (board[x][i][i] == 3 - firstLinePlayer){
+                if (board[x][i][i] == 3 - firstLinePlayer) {
                     isline = false;
                     break;
                 }
-                if (board[x][i][i] == firstLinePlayer) lineSum +=1;
+                if (board[x][i][i] == firstLinePlayer) lineSum += 1;
             }
-            if(firstLinePlayer != 0 && isline)
-            {
-                if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-                else sumReward -=  Math.pow(10,lineSum);
+            if (firstLinePlayer != 0 && isline) {
+                if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+                else sumReward -= Math.pow(10, lineSum);
             }
         }
         if (z + y == size - 1) {
@@ -520,16 +521,15 @@ public class Board {
                 if (firstLinePlayer == 0 && board[x][i][size - 1 - i] != 0) {
                     firstLinePlayer = board[x][i][size - 1 - i];
                 }
-                if (board[x][i][size - 1 - i] == 3 - firstLinePlayer){
+                if (board[x][i][size - 1 - i] == 3 - firstLinePlayer) {
                     isline = false;
                     break;
                 }
-                if (board[x][i][size - 1 - i] == firstLinePlayer) lineSum +=1;
+                if (board[x][i][size - 1 - i] == firstLinePlayer) lineSum += 1;
             }
-            if(firstLinePlayer != 0 && isline)
-            {
-                if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-                else sumReward -=  Math.pow(10,lineSum);
+            if (firstLinePlayer != 0 && isline) {
+                if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+                else sumReward -= Math.pow(10, lineSum);
             }
         }
 
@@ -539,19 +539,18 @@ public class Board {
             firstLinePlayer = 0;
             lineSum = 0;
             for (int i = 0; i < size; i++) {
-                if (firstLinePlayer == 0 && board[i][i][i]  != 0) {
-                    firstLinePlayer = board[i][i][i] ;
+                if (firstLinePlayer == 0 && board[i][i][i] != 0) {
+                    firstLinePlayer = board[i][i][i];
                 }
-                if (board[i][i][i]  == 3 - firstLinePlayer){
+                if (board[i][i][i] == 3 - firstLinePlayer) {
                     isline = false;
                     break;
                 }
-                if (board[i][i][i]  == firstLinePlayer) lineSum +=1;
+                if (board[i][i][i] == firstLinePlayer) lineSum += 1;
             }
-            if(firstLinePlayer != 0 && isline)
-            {
-                if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-                else sumReward -=  Math.pow(10,lineSum);
+            if (firstLinePlayer != 0 && isline) {
+                if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+                else sumReward -= Math.pow(10, lineSum);
             }
         }
 
@@ -563,16 +562,15 @@ public class Board {
                 if (firstLinePlayer == 0 && board[i][size - 1 - i][i] != 0) {
                     firstLinePlayer = board[i][size - 1 - i][i];
                 }
-                if (board[i][size - 1 - i][i] == 3 - firstLinePlayer){
+                if (board[i][size - 1 - i][i] == 3 - firstLinePlayer) {
                     isline = false;
                     break;
                 }
-                if (board[i][size - 1 - i][i] == firstLinePlayer) lineSum +=1;
+                if (board[i][size - 1 - i][i] == firstLinePlayer) lineSum += 1;
             }
-            if(firstLinePlayer != 0 && isline)
-            {
-                if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-                else sumReward -=  Math.pow(10,lineSum);
+            if (firstLinePlayer != 0 && isline) {
+                if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+                else sumReward -= Math.pow(10, lineSum);
             }
         }
 
@@ -584,16 +582,15 @@ public class Board {
                 if (firstLinePlayer == 0 && board[i][i][size - 1 - i] != 0) {
                     firstLinePlayer = board[i][i][size - 1 - i];
                 }
-                if (board[i][i][size - 1 - i] == 3 - firstLinePlayer){
+                if (board[i][i][size - 1 - i] == 3 - firstLinePlayer) {
                     isline = false;
                     break;
                 }
-                if (board[i][i][size - 1 - i] == firstLinePlayer) lineSum +=1;
+                if (board[i][i][size - 1 - i] == firstLinePlayer) lineSum += 1;
             }
-            if(firstLinePlayer != 0 && isline)
-            {
-                if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-                else sumReward -=  Math.pow(10,lineSum);
+            if (firstLinePlayer != 0 && isline) {
+                if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+                else sumReward -= Math.pow(10, lineSum);
             }
         }
 
@@ -605,16 +602,15 @@ public class Board {
                 if (firstLinePlayer == 0 && board[size - 1 - i][i][i] != 0) {
                     firstLinePlayer = board[size - 1 - i][i][i];
                 }
-                if (board[size - 1 - i][i][i] == 3 - firstLinePlayer){
+                if (board[size - 1 - i][i][i] == 3 - firstLinePlayer) {
                     isline = false;
                     break;
                 }
-                if (board[size - 1 - i][i][i] == firstLinePlayer) lineSum +=1;
+                if (board[size - 1 - i][i][i] == firstLinePlayer) lineSum += 1;
             }
-            if(firstLinePlayer != 0 && isline)
-            {
-                if(firstLinePlayer == player) sumReward += Math.pow(10,lineSum);
-                else sumReward -=  Math.pow(10,lineSum);
+            if (firstLinePlayer != 0 && isline) {
+                if (firstLinePlayer == player) sumReward += Math.pow(10, lineSum);
+                else sumReward -= Math.pow(10, lineSum);
             }
         }
 
@@ -898,5 +894,17 @@ public class Board {
             }
         }
         return sumReward;
+    }
+
+    public void Print() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                for (int k = 0; k < size; k++) {
+                    System.out.print(board[k][j][i] + " ");
+                }
+                System.out.println();
+            }
+            System.out.println();
+        }
     }
 }
