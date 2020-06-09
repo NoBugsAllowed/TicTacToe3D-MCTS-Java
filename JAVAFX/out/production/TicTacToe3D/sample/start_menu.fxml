@@ -24,12 +24,21 @@
             <Button prefWidth="300"
                     style="-fx-background-image: url(&quot;sample/icons/player.png&quot;);" styleClass="menuButton"
                     text="Player vs Player" fx:id="btnPvP"/>
-            <Button fx:id="btnPvAIEasy" prefWidth="300"
+            <Button fx:id="btnMCTS" prefWidth="300"
                     style="-fx-background-image: url(&quot;sample/icons/ai.png&quot;);" styleClass="menuButton"
-                    text="Player vs AI (easy)"/>
-            <Button fx:id="btnPvAIHard" prefWidth="300"
+                    text="AI MCTS"/>
+            <Button fx:id="btnMCTSMod1" prefWidth="300"
                     style="-fx-background-image: url(&quot;sample/icons/ai.png&quot;);" styleClass="menuButton"
-                    text="Player vs AI (hard)"/>
+                    text="AI MCTS Mod 1"/>
+            <Button fx:id="btnMCTSMod2" prefWidth="300"
+                    style="-fx-background-image: url(&quot;sample/icons/ai.png&quot;);" styleClass="menuButton"
+                    text="AI MCTS Mod 2"/>
+            <Button fx:id="btnMCTSHeuristic" prefWidth="300"
+                    style="-fx-background-image: url(&quot;sample/icons/ai.png&quot;);" styleClass="menuButton"
+                    text="AI MCTS with Heuristic"/>
+            <Button fx:id="btnHeuristic" prefWidth="300"
+                    style="-fx-background-image: url(&quot;sample/icons/ai.png&quot;);" styleClass="menuButton"
+                    text="AI Heuristic"/>
         </VBox>
     </center>
 </BorderPane>

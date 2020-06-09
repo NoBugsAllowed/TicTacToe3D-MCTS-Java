@@ -56,6 +56,7 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
     private int player = 1;
     private boolean isGameFinished = false;
     private TicTacToe3D game;
+    private ArtificialPlayer aiPlayer;
 
     @Override
     public void moveMade(int player, int x, int y, int z) {
@@ -83,10 +84,6 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
     }
 
     private Scene createGameArea() {
-
-        //ArtificialPlayer p = new MctsUctPlayer(2,new SecondModyficationUctPolicy(1),new MonteCarloPolicy());
-        ArtificialPlayer p = new HeuristicPlayer(2);
-
         // Sticks
         AnchorPane anchorPane = new AnchorPane();
         Scene scene = new Scene(anchorPane);
@@ -127,22 +124,22 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
                         // Tutaj wywolac game.makeMove()
                         Board board1 = new Board(game.getSize());
                         board1.setBoard(game.getBoard());
-//                        new Thread(new Runnable() {
-//                            public void run() {
-//                                p.PrepareMove(10000,board1);
-//                            }
-//                        }).start();
-//
-//                        try {
-//                            Thread.sleep(100);
-//                            Position pos = p.MakeMove();
-//                            game.makeMove(2,pos.getX(),pos.getY());
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-                        p.PrepareMove(1000,board1);
-                        Position pos = p.MakeMove();
-                        game.makeMove(2,pos.getX(),pos.getY());
+                        new Thread(new Runnable() {
+                            public void run() {
+                                aiPlayer.PrepareMove(1000,board1);
+                            }
+                        }).start();
+
+                        try {
+                            Thread.sleep(100);
+                            Position pos = aiPlayer.MakeMove();
+                            game.makeMove(2,pos.getX(),pos.getY());
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+//                        aiPlayer.PrepareMove(1000,board1);
+//                        Position pos = aiPlayer.MakeMove();
+//                        game.makeMove(2,pos.getX(),pos.getY());
 
                     }
                 });
@@ -153,7 +150,7 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
         Box surface = new Box(N * STICK_DIST, 0.5, N * STICK_DIST);
         surface.setTranslateX((N - 1) * STICK_DIST / 2);
         surface.setTranslateZ((N - 1) * STICK_DIST / 2);
-        surface.setMaterial(new PhongMaterial(Color.BROWN));
+        surface.setMaterial(new PhongMaterial(Color.rgb(56, 51, 49)));
         surface.setDrawMode(DrawMode.FILL);
         // Przesuniecie kamery
         Translate pivot = new Translate((N - 1) * STICK_DIST / 2,0,(N - 1) * STICK_DIST / 2);
@@ -175,7 +172,7 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
 
         // Use a SubScene
         SubScene subScene = new SubScene(root, 800, 500, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.LIGHTYELLOW);
+        subScene.setFill(Color.rgb(237, 219, 209));
         subScene.setCamera(camera);
         subScene.setOnMousePressed(event -> {
             lastMouseX = event.getSceneX();
@@ -222,7 +219,7 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
         Parent root = FXMLLoader.load(getClass().getResource("start_menu.fxml"));
 
         // Prepare comboBoxes for choosing colors
-        List<Color> colorList = Arrays.asList(Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.PINK, Color.WHITE);
+        List<Color> colorList = Arrays.asList(Color.rgb(14, 147, 230), Color.rgb(232, 75, 19), Color.rgb(65, 179, 61), Color.YELLOW, Color.PINK, Color.WHITE);
 
         ComboBox<Color> cbFirst = (ComboBox<Color>) root.lookup("#cbFirstColor");
         ComboBox<Color> cbSecond = (ComboBox<Color>) root.lookup("#cbSecondColor");
@@ -279,34 +276,53 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
             gameMode = GameMode.PvP;
             switchScene(createGameArea());
         });
-        Button btnPvAIEasy = (Button) root.lookup("#btnPvAIEasy");
-        btnPvAIEasy.setOnAction(e -> {
+        Button btnPvAIMCTS = (Button) root.lookup("#btnMCTS");
+        btnPvAIMCTS.setOnAction(e -> {
             COLOR_1 = cbFirst.getSelectionModel().getSelectedItem();
             COLOR_2 = cbSecond.getSelectionModel().getSelectedItem();
-            currentColor = COLOR_1;
-            game = new TicTacToe3D(N);
-            game.attachOnMoveListener(this);
-            try {
-                game.registerPlayer("Player 1");
-                game.registerPlayer("AI");
-            }
-            catch (TicTacToe3D.GameStartedException ex) {
-                ex.printStackTrace();
-            }
-            gameMode = GameMode.PvAI;
-            switchScene(createGameArea());
+            startPvAI("AI MCTS", new MctsUctPlayer(2, new BasicUctPolicy(Math.sqrt(2), 0), new MonteCarloPolicy()));
         });
-        Button btnPvAIHard = (Button) root.lookup("#btnPvAIHard");
-        btnPvAIHard.setOnAction(e -> {
+        Button btnPvAIMCTSMod1 = (Button) root.lookup("#btnMCTSMod1");
+        btnPvAIMCTSMod1.setOnAction(e -> {
             COLOR_1 = cbFirst.getSelectionModel().getSelectedItem();
             COLOR_2 = cbSecond.getSelectionModel().getSelectedItem();
-            currentColor = COLOR_1;
-            game = new TicTacToe3D(N);
-            game.attachOnMoveListener(this);
-            gameMode = GameMode.PvAI;
-            switchScene(createGameArea());
+            startPvAI("AI MCTS Mod 1", new MctsUctPlayer(2, new BestNodeUtcPolicy(Math.sqrt(2), 0.1), new MonteCarloPolicy()));
+        });
+        Button btnPvAIMCTSMod2 = (Button) root.lookup("#btnMCTSMod2");
+        btnPvAIMCTSMod2.setOnAction(e -> {
+            COLOR_1 = cbFirst.getSelectionModel().getSelectedItem();
+            COLOR_2 = cbSecond.getSelectionModel().getSelectedItem();
+            startPvAI("AI MCTS Mod 2", new MctsUctPlayer(2, new SecondModyficationUctPolicy(0.1), new MonteCarloPolicy()));
+        });
+        Button btnPvAIMCTSHeuristic = (Button) root.lookup("#btnMCTSHeuristic");
+        btnPvAIMCTSHeuristic.setOnAction(e -> {
+            COLOR_1 = cbFirst.getSelectionModel().getSelectedItem();
+            COLOR_2 = cbSecond.getSelectionModel().getSelectedItem();
+            startPvAI("AI MCTS with Heuristic", new MctsUctPlayer(2, new BestNodeUtcPolicy(Math.sqrt(2), 0.1), new MonteCarloHeuristicPolicy()));
+        });
+        Button btnPvAIHeuristic = (Button) root.lookup("#btnHeuristic");
+        btnPvAIHeuristic.setOnAction(e -> {
+            COLOR_1 = cbFirst.getSelectionModel().getSelectedItem();
+            COLOR_2 = cbSecond.getSelectionModel().getSelectedItem();
+            startPvAI("AI Heuristic", new HeuristicPlayer(2));
         });
         return new Scene(root, 400, 600);
+    }
+
+    private void startPvAI(String name, ArtificialPlayer ai) {
+        currentColor = COLOR_1;
+        game = new TicTacToe3D(N);
+        aiPlayer = ai;
+        game.attachOnMoveListener(this);
+        try {
+            game.registerPlayer("Player 1");
+            game.registerPlayer(name);
+        }
+        catch (TicTacToe3D.GameStartedException ex) {
+            ex.printStackTrace();
+        }
+        gameMode = GameMode.PvAI;
+        switchScene(createGameArea());
     }
 
     private void displayMenu(int winner) throws IOException {

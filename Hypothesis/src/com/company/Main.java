@@ -39,8 +39,8 @@ public class Main {
         Result res = hypothesis1(
                 new MctsUctPlayer(1, new BasicUctPolicy(1, 1), new MonteCarloPolicy()),
                 new MctsUctPlayer(2, new BasicUctPolicy(1, 2), new MonteCarloPolicy()),
-                10, 100);
-        res.SaveToFile("test.txt");
+                500, 500);
+        res.SaveToFile("hypothesis1.txt");
     }
 
     private static int Play(ArtificialPlayer p1, ArtificialPlayer p2, int moveTime) {
@@ -96,6 +96,7 @@ public class Main {
     private static Result hypothesis1(ArtificialPlayer p1, ArtificialPlayer p2, int gamesCount, int moveTime) {
         Result r = new Result();
         for (int i = 0; i < gamesCount; i++) {
+            System.out.println(i);
             int res = Play(p1, p2, moveTime);
             if (res == p1.GetId()) {
                 r.P1Wins++;
