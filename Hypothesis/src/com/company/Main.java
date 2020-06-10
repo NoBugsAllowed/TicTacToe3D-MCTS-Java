@@ -26,38 +26,38 @@ public class Main {
         res = playGamesSwitchPlayers(
                 new MctsUctPlayer(1, new BasicUctPolicy(Math.sqrt(2), 1), new MonteCarloPolicy()),
                 new MctsUctPlayer(2, new BestNodeUtcPolicy(Math.sqrt(2), 0.1), new MonteCarloPolicy()),
-                500, 500);
+                500, 1000);
         res.SaveToFile("basic_vs_mod1.txt");
         System.out.println("Hipoteza 2, modyfikacja 2");
         res = playGamesSwitchPlayers(
                 new MctsUctPlayer(1, new BasicUctPolicy(Math.sqrt(2), 1), new MonteCarloPolicy()),
                 new MctsUctPlayer(2, new SecondModyficationUctPolicy(0.1), new MonteCarloPolicy()),
-                500, 500);
+                500, 1000);
         res.SaveToFile("basic_vs_mod2.txt");
         // Hipoteza 3 - Czy wartosc C=sqrt(2) lepsza niz inne
 //        System.out.println("Hipoteza 3, C=0.5");
 //        res = playGamesSwitchPlayers(
 //                new MctsUctPlayer(1, new BasicUctPolicy(Math.sqrt(2), 1), new MonteCarloPolicy()),
 //                new MctsUctPlayer(2, new BasicUctPolicy(0.5, 2), new MonteCarloPolicy()),
-//                200, 200);
+//                200, 1000);
 //        res.SaveToFile("hypothesis3_0_5.txt");
 //        System.out.println("Hipoteza 3, C=1");
 //        res = playGamesSwitchPlayers(
 //                new MctsUctPlayer(1, new BasicUctPolicy(Math.sqrt(2), 1), new MonteCarloPolicy()),
 //                new MctsUctPlayer(2, new BasicUctPolicy(1, 2), new MonteCarloPolicy()),
-//                200, 200);
+//                200, 1000);
 //        res.SaveToFile("hypothesis3_1.txt");
 //        System.out.println("Hipoteza 3, C=2");
 //        res = playGamesSwitchPlayers(
 //                new MctsUctPlayer(1, new BasicUctPolicy(Math.sqrt(2), 1), new MonteCarloPolicy()),
 //                new MctsUctPlayer(2, new BasicUctPolicy(2, 2), new MonteCarloPolicy()),
-//                200, 200);
+//                200, 1000);
 //        res.SaveToFile("hypothesis3_2.txt");
 //        System.out.println("Hipoteza 3, C=2.5");
 //        res = playGamesSwitchPlayers(
 //                new MctsUctPlayer(1, new BasicUctPolicy(Math.sqrt(2), 1), new MonteCarloPolicy()),
 //                new MctsUctPlayer(2, new BasicUctPolicy(2.5, 2), new MonteCarloPolicy()),
-//                200, 200);
+//                200, 1000);
 //        res.SaveToFile("hypothesis3_2_5.txt");
     }
 
