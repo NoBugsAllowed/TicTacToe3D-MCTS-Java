@@ -142,8 +142,7 @@ public class MctsUctPlayer implements ArtificialPlayer {
         }
         if(bestPosition == null)
         {
-
-            int kkk = 4;
+            bestPosition = children.get(0).getLastMove();
         }
         return bestPosition;
     }

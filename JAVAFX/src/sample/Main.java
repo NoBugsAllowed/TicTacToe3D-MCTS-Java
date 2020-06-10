@@ -121,7 +121,6 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
                     }
                     else {
                         // ruch AI
-                        // Tutaj wywolac game.makeMove()
                         Board board1 = new Board(game.getSize());
                         board1.setBoard(game.getBoard());
                         new Thread(new Runnable() {
@@ -137,10 +136,6 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-//                        aiPlayer.PrepareMove(1000,board1);
-//                        Position pos = aiPlayer.MakeMove();
-//                        game.makeMove(2,pos.getX(),pos.getY());
-
                     }
                 });
                 sticks[i + j * N] = stick;
@@ -330,17 +325,9 @@ public class Main extends Application implements TicTacToe3D.OnMoveMadeListener 
         double centerXPosition = window.getX() + window.getWidth() / 2d;
         double centerYPosition = window.getY() + window.getHeight() / 2d;
 
-        Button btnPlayAgain = (Button) root.lookup("#btnPlayAgain");
         Button btnStartMenu = (Button) root.lookup("#btnStartMenu");
         Button btnExit = (Button) root.lookup("#btnExit");
 
-        btnPlayAgain.setOnAction(e -> {
-            currentColor = COLOR_1;
-            isGameFinished = false;
-            window.removeEventHandler(KeyEvent.KEY_RELEASED,escPressedHandler);
-            switchScene(createGameArea());
-            ((Stage) ((Button) e.getSource()).getScene().getWindow()).close();
-        });
         btnStartMenu.setOnAction(e -> {
             try {
                 isGameFinished = false;

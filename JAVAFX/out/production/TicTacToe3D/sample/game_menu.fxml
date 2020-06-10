@@ -15,9 +15,6 @@
     </padding>
     <center>
         <VBox alignment="CENTER" spacing="30">
-            <Button fx:id="btnPlayAgain" prefWidth="300"
-                    style="-fx-background-image: url(&quot;sample/icons/playAgain.png&quot;);" styleClass="menuButton"
-                    text="Play again"/>
             <Button fx:id="btnStartMenu" prefWidth="300"
                     style="-fx-background-image: url(&quot;sample/icons/backToMenu.png&quot;);" styleClass="menuButton"
                     text="Main menu"/>
